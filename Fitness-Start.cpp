@@ -84,9 +84,14 @@ public:
 			cout << "You do not have the skill to " << getName() << endl;
 			return false;
 		}
-		if (p.wealth < 1)
+		if (p.wealth < 10)
 		{
 			cout << "You do not have enough money to " << getName() << endl;
+			return false;
+		}
+		if (p.calories < 100)
+		{
+			cout << "You do not have enough calories to " << getName() << endl;
 			return false;
 		}
 		if (0 == p.strength)
@@ -94,10 +99,10 @@ public:
 			cout << "You do not have enough strength to " << getName() << endl;
 			return false;
 		}
-		p.wealth --; // if all the minimun requirements are met then Eat is preformed and the changes to the person object occur
-		p.calories += 200;
+		p.wealth -= 10; // if all the minimun requirements are met then the Go to library;; is preformed and the changes to the person object occur
+		p.calories -= 100;
 		p.strength--;
-		p.knowledge += 15;
+		p.knowledge += 20;
 		return true;
 	}
 
@@ -265,12 +270,7 @@ public:
 			cout << "You do not have enough strength to " << getName() << endl;
 			return false;
 		}
-		if (p.wealth < 3) {
-			cout << "You do not have enough Wealth to " << getName() << endl;
-			return false;
-		}
-		p.fitness +=10;
-		p.wealth -= 3;
+		p.fitness +=20;
 		p.strength -= 2;
 		p.calories -= 300;
 		return true;
@@ -307,7 +307,7 @@ public:
 			return false;
 		}
 		p.fitness += 4;
-		p.strength += 2;
+		p.strength += 15;
 		p.calories -= 100;
 		return true;
 	}
@@ -383,18 +383,18 @@ public:
 			cout << "You do not have the skill to " << getName() << endl;
 			return false;
 		}
-		if (p.calories < 50) {
+		if (p.calories < 150) {
 			cout << "You do not have enough calories to " << getName() << endl;
 			return false;
 		}
-		if (p.wealth < 5) {
+		if (p.wealth < 10) {
 			cout << "You do not have enough wealth to " << getName() << endl;
 			return false;
 		}
-		p.fitness += 10;
-		p.wealth -= 5;
-		p.strength += 20;
-		p.calories -= 50;
+		p.fitness += 8;
+		p.wealth -= 10;
+		p.strength += 30;
+		p.calories -= 150;
 		return true;
 	}
 
@@ -478,14 +478,14 @@ void aquireSkill(Person *p)
 	char answer;
 
 	cout << "\n\nWhich skill would you like to aquire:" << endl;
-	cout << "  (E)at\n";
-	cout << "  Work at (S)tore\n";
-	cout << "  Work in (T)ech\n";
-	cout << "  Go for a (R)un\n";
-	cout << "  Do sit-(U)ps\n";
-	cout << "  Exercise on the e(l)liptical\n";
-	cout << "  (W)eight Lift\n";
-	cout << "  (G)o To Library\n";
+	cout << "  (E)at --> -40 Wealth, +2000 Calories, -1 Strength\n";
+	cout << "  Work at (S)tore --> -5 Fitness, +120 Wealth, -1000 Calories, -1 Strength \n";
+	cout << "  Work in (T)ech --> -30 Fitness, + 250 Wealth, -750 Calories \n";
+	cout << "  Go for a (R)un --> +20 Fitness, -2 Strength, -300 Calories \n";
+	cout << "  Do sit-(U)ps--> +4 fitness, +15 Strength, -100 calories \n";
+	cout << "  Exercise on the e(l)liptical --> +20 Fitness, -4 Wealth, -1 Strength, -60 Calories\n";
+	cout << "  (W)eight Lift --> +8 Fitness, -10 Wealth, +30 Strength, -150 Calories \n";
+	cout << "  (G)o To Library --> -10 Wealth, -100 Calories, -1 Strength, +20 Knowledge \n\n";
 	cout << "\nEnter your choice here --> ";
 
 	cin >> answer;
@@ -615,14 +615,14 @@ int main()
 				if (answer == dayMap[d])
 				{
 					cout << "Choose an activity to do on " << dayMap[d] << ":" << endl;
-					cout << "  (E)at\n";
-					cout << "  Work at (S)tore\n";
-					cout << "  Work in (T)ech\n";
-					cout << "  Go for a (R)un\n";
-					cout << "  Do sit-(U)ps\n";
-					cout << "  Exercise on the e(l)liptical\n";
-					cout << "  (W)eight Lift\n";
-					cout << "  (G)o To Library\n\n";
+					cout << "  (E)at --> -40 Wealth, +2000 Calories, -1 Strength\n";
+					cout << "  Work at (S)tore --> -5 Fitness, +120 Wealth, -1000 Calories, -1 Strength \n";
+					cout << "  Work in (T)ech --> -30 fitness, + 250 Wealth, -750 Calories \n";
+					cout << "  Go for a (R)un --> +20 fitness, -2 strength, -300 calories \n";
+					cout << "  Do sit-(U)ps--> +4 fitness, +15 strength, -100 calories \n";
+					cout << "  Exercise on the e(l)liptical --> +20 fitness, -4 wealth, -1 strength, -60 calories\n";
+					cout << "  (W)eight Lift --> +8 Fitness, -10 Wealth, +30 Strength, -150 Calories \n";
+					cout << "  (G)o To Library --> -10 Wealth, -100 Calories, -1 Strength, +20 Knowledge \n\n";
 					cout << " Enter your choice --> ";
 					char c;
 
