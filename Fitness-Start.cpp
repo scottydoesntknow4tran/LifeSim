@@ -33,7 +33,16 @@ enum class Activities // keys used for the skills map in the Person class, this 
 	WeightLift,
 	Eat,
 	GoToLibrary,
+	CustomActivity,
 	Invalid
+};
+
+class goal {
+public:
+	int* goalptr;
+	int _goal;
+
+	goal* nextgoalptr = nullptr;
 };
 
 class Person // this class creates the object for the person that we are simulating, it defines at the parameters and their starting values
@@ -60,19 +69,104 @@ public:
 };
 
 
-
 class Activity // this is the base class that defines the virtual functions and where we derive from to create the different functions for every activity
 {
 	string _name;
 public:
 	Activity(string name) { _name = name; }
+	virtual void askforname(){
+		cout << "What is the name of your Custom Activity?" << endl;
+		cin>>_name;
+	}
 	virtual bool perform(Person& p) = 0; // what happens when the activity is put into the weekly schedule and occurs
 	virtual bool developSkill(Person& p) = 0; // adding the skill to the list of available skills
 	virtual int costToAquireSkill() = 0; //  what it costs to develop the skill for future use
 	string getName() { return _name; } // returns the name of the activity which is defined in the constructor
 };
 
-class GoToLibrary : public Activity // this the Eat function that is derived from the base activity class
+class CustomActivity : public Activity
+{
+public :
+	string _CustomName;
+	int CStrength;
+	int CFitness;
+	int CCalories;
+	int CWealth;
+	int CKnowledge;
+	int LearningCost;
+	CustomActivity():Activity("bob"){
+		askforname();
+		creation();
+	};
+
+	void creation(){
+		cout << "What is the Strength change due to the " << _CustomName << " activity? (postive or negative integer)" << endl;
+		cin >> CStrength;
+		cout << "What is the Fitness change due to the " << _CustomName << " activity? (postive or negative integer)" << endl;
+		cin >> CFitness;
+		cout << "What is the Calorie change due to the " << _CustomName << " activity? (postive or negative integer)" << endl;
+		cin >> CCalories;
+		cout << "What is the Wealth change due to the " << _CustomName << " activity? (postive or negative integer)" << endl;
+		cin >> CWealth;
+		cout << "What is the Knowledge change due to the " << _CustomName << " activity? (postive or negative integer)" << endl;
+		cin >> CKnowledge;
+		cout << "What is the cost to learn the " << _CustomName << " activity? (postive integer)" << endl;
+		cin >> LearningCost;
+	};
+	
+	bool perform(Person& p) {
+		if (0 == p.skills.count(Activities::CustomActivity)) {
+			cout << "You do not have the skill to " << getName() << endl;
+			return false;
+		}
+		if (p.wealth < (-1 * CWealth))
+		{
+			cout << "You do not have enough Wealth to " << getName() << endl;
+			return false;
+		}
+		if (p.calories < (-1 * CCalories))
+		{
+			cout << "You do not have enough calories to " << getName() << endl;
+			return false;
+		}
+		if (p.strength < (-1 * CStrength))
+		{
+			cout << "You do not have enough strength to " << getName() << endl;
+			return false;
+		}
+		if (p.fitness < (-1 * CFitness)) {
+			cout << "You do not have enough Fitness to " << getName() << endl;
+			return false;
+		}
+		if (p.knowledge < (-1 * CKnowledge)) {
+			cout << "You do not have enough Knowledge to " << getName() << endl;
+			return false;
+		}
+		p.wealth = p.wealth + CWealth; // if all the minimun requirements are met then the custom activity;; is preformed and the changes to the person object occur
+		p.calories = p.calories + CCalories;
+		p.strength = p.strength + CStrength;
+		p.knowledge = p.knowledge + CKnowledge;
+		p.fitness = p.fitness + CFitness;
+		return true;
+	}
+	
+	int costToAquireSkill() { return LearningCost; }
+
+	bool developSkill(Person& p)
+	{
+		p.skills.insert(make_pair(Activities::CustomActivity, (Activity*)this)); // the derived activities 
+		p.wealth -= costToAquireSkill();
+
+		if (p.wealth < 0)
+		{
+			throw ("Wealth went negative");
+		}
+		return true;
+	};
+	
+};
+
+class GoToLibrary : public Activity // this the Go To Library function that is derived from the base activity class
 {
 public:
 	GoToLibrary() : Activity("GoToLibrary") {}; // derived constructor that defines the name of the activity
@@ -84,9 +178,14 @@ public:
 			cout << "You do not have the skill to " << getName() << endl;
 			return false;
 		}
-		if (p.wealth < 1)
+		if (p.wealth < 10)
 		{
-			cout << "You do not have enough money to " << getName() << endl;
+			cout << "You do not have enough Wealth to " << getName() << endl;
+			return false;
+		}
+		if (p.calories < 100)
+		{
+			cout << "You do not have enough Calories to " << getName() << endl;
 			return false;
 		}
 		if (0 == p.strength)
@@ -94,14 +193,14 @@ public:
 			cout << "You do not have enough strength to " << getName() << endl;
 			return false;
 		}
-		p.wealth --; // if all the minimun requirements are met then Eat is preformed and the changes to the person object occur
-		p.calories += 200;
+		p.wealth -= 10; // if all the minimun requirements are met then the Go to library;; is preformed and the changes to the person object occur
+		p.calories -= 100;
 		p.strength--;
-		p.knowledge += 15;
+		p.knowledge += 20;
 		return true;
 	}
 
-	int costToAquireSkill() { return 25; } // the cost to learn the eat skill is nothing
+	int costToAquireSkill() { return 25; } 
 
 	bool developSkill(Person& p)
 	{
@@ -265,12 +364,7 @@ public:
 			cout << "You do not have enough strength to " << getName() << endl;
 			return false;
 		}
-		if (p.wealth < 3) {
-			cout << "You do not have enough Wealth to " << getName() << endl;
-			return false;
-		}
-		p.fitness +=10;
-		p.wealth -= 3;
+		p.fitness +=20;
 		p.strength -= 2;
 		p.calories -= 300;
 		return true;
@@ -307,7 +401,7 @@ public:
 			return false;
 		}
 		p.fitness += 4;
-		p.strength += 2;
+		p.strength += 15;
 		p.calories -= 100;
 		return true;
 	}
@@ -383,18 +477,18 @@ public:
 			cout << "You do not have the skill to " << getName() << endl;
 			return false;
 		}
-		if (p.calories < 50) {
+		if (p.calories < 150) {
 			cout << "You do not have enough calories to " << getName() << endl;
 			return false;
 		}
-		if (p.wealth < 5) {
+		if (p.wealth < 10) {
 			cout << "You do not have enough wealth to " << getName() << endl;
 			return false;
 		}
-		p.fitness += 10;
-		p.wealth -= 5;
-		p.strength += 20;
-		p.calories -= 50;
+		p.fitness += 8;
+		p.wealth -= 10;
+		p.strength += 30;
+		p.calories -= 150;
 		return true;
 	}
 
@@ -478,14 +572,15 @@ void aquireSkill(Person *p)
 	char answer;
 
 	cout << "\n\nWhich skill would you like to aquire:" << endl;
-	cout << "  (E)at\n";
-	cout << "  Work at (S)tore\n";
-	cout << "  Work in (T)ech\n";
-	cout << "  Go for a (R)un\n";
-	cout << "  Do sit-(U)ps\n";
-	cout << "  Exercise on the e(l)liptical\n";
-	cout << "  (W)eight Lift\n";
-	cout << "  (G)o To Library\n";
+	cout << "  (E)at --> -40 Wealth, +2000 Calories, -1 Strength\n";
+	cout << "  Work at (S)tore --> -5 Fitness, +120 Wealth, -1000 Calories, -1 Strength \n";
+	cout << "  Work in (T)ech --> -30 Fitness, + 250 Wealth, -750 Calories \n";
+	cout << "  Go for a (R)un --> +20 Fitness, -2 Strength, -300 Calories \n";
+	cout << "  Do sit-(U)ps--> +4 fitness, +15 Strength, -100 calories \n";
+	cout << "  Exercise on the e(l)liptical --> +20 Fitness, -4 Wealth, -1 Strength, -60 Calories\n";
+	cout << "  (W)eight Lift --> +8 Fitness, -10 Wealth, +30 Strength, -150 Calories \n";
+	cout << "  (G)o To Library --> -10 Wealth, -100 Calories, -1 Strength, +20 Knowledge \n";
+	cout << "  (C)ustom Activity --> (create your own actvity to learn)";
 	cout << "\nEnter your choice here --> ";
 
 	cin >> answer;
@@ -519,6 +614,9 @@ void aquireSkill(Person *p)
 	case 'G':
 		aPtr = new GoToLibrary();
 		break;
+	case 'C':
+		aPtr = new CustomActivity();
+		break;
 
 	default:
 		cout << "Ignoring invalid response " << answer << endl;
@@ -548,52 +646,89 @@ int main()
 {
 	Person p;
 
+
 	int nweeks = 0;
 
 	Activity* weeklySchedule[7] = { nullptr };
+	char response = 'Y';
+	goal* lastgoal = nullptr;
+	goal* head = nullptr;
+	while (response == 'Y'){
+		char goalAnswer;
+		cout << "what is your goal?" << endl; // this is where you set your life goal and the amount needed to win
+		cout << "(S)trength" << endl;
+		cout << "(F)itness" << endl;
+		cout << "(W)ealth" << endl;
+		cout << "or" << endl;
+		cout << "(K)nowledge" << endl;
+		cin >> goalAnswer;
+		
+		goal* ptr = new goal();
+
+		if (lastgoal != nullptr) {
+			lastgoal->nextgoalptr = ptr;
+		}
+		else {
+			head = ptr;
+		}
+
+		switch (toupper(goalAnswer))
+		{
+		case 'S':
+			ptr->goalptr = &p.strength;
+			break;
+		case 'F':
+			ptr->goalptr = &p.fitness;
+			break;
+		case 'W':
+			ptr->goalptr = &p.wealth;
+			break;
+		case 'K':
+			ptr->goalptr = &p.knowledge;
+			break;
+
+		default:
+			cout << "Ignoring invalid response " << goalAnswer << endl;
+		}
+
+		cout << "What is your goal level? (50-500)" << endl;
+		cin >> ptr->_goal;
+		if ((ptr->_goal > 500) or (ptr->_goal < 50)) {
+			ptr->_goal = 100;
+			cout << "Response out of bounds, goal set to 300"<< endl;
+		}
+		cout << "Want to add another goal?(Y/N)" << endl;
+		cin >> response;
+		if (response == 'Y') {
+			lastgoal = ptr;
+		}
+		ptr = nullptr;
+
+	}
+	int _goal = 0;
+
 	
-	char goalAnswer;
-	cout << "what is your goal?" << endl; // this is where you set your life goal and the amount needed to win
-	cout << "(S)trength" << endl;
-	cout << "(F)itness" << endl;
-	cout << "(W)ealth" << endl;
-	cout << "or" << endl;
-	cout << "(K)nowledge" << endl;
-	cin >> goalAnswer;
-
-	switch (toupper(goalAnswer))
+	
+	for(;;)
 	{
-	case 'S':
-		p.goal = &p.strength;
-		break;
-	case 'F':
-		p.goal = &p.fitness;
-		break;
-	case 'W':
-		p.goal = &p.wealth;
-		break;
-	case 'K':
-		p.goal = &p.knowledge;
-		break;
+		goal* ptr = head;
 
-	default:
-		cout << "Ignoring invalid response " << goalAnswer << endl;
-	}
+		while (ptr != nullptr) {
+			if (*ptr->goalptr >= ptr->_goal) {
+				ptr = ptr->nextgoalptr;
+			}
+			else {
+				break;
+			}
+		}
+		if (ptr == nullptr) {
+			break;
+		}
 
-	int GoalValue;
-	cout << "What is your goal level? (50-500)" << endl;
-	cin >> GoalValue;
-	if ((GoalValue > 500) or (GoalValue < 50)) {
-		GoalValue = 100;
-		cout << "Response out of bounds, goal set to 100" << endl;
-	}
-
-	while (*p.goal < GoalValue)
-	{
 		string answer;
 		displayStats(&p, weeklySchedule);
 
-		cout << "What day would you like to change or enter \'(s)kill\' to aquire a skill or \'(p)erform\' to peform all the activites in the week --> "<< endl;
+		cout << "What day would you like to change (Mon, Tue, Wed...) or enter \'(s)kill\' to aquire a skill or \'(p)erform\' to peform all the activites in the week --> "<< endl;
 		cin >> answer;
 
 		if ("s" == answer)
@@ -615,14 +750,15 @@ int main()
 				if (answer == dayMap[d])
 				{
 					cout << "Choose an activity to do on " << dayMap[d] << ":" << endl;
-					cout << "  (E)at\n";
-					cout << "  Work at (S)tore\n";
-					cout << "  Work in (T)ech\n";
-					cout << "  Go for a (R)un\n";
-					cout << "  Do sit-(U)ps\n";
-					cout << "  Exercise on the e(l)liptical\n";
-					cout << "  (W)eight Lift\n";
-					cout << "  (G)o To Library\n\n";
+					cout << "  (E)at --> -40 Wealth, +2000 Calories, -1 Strength\n";
+					cout << "  Work at (S)tore --> -5 Fitness, +120 Wealth, -1000 Calories, -1 Strength \n";
+					cout << "  Work in (T)ech --> -30 fitness, + 250 Wealth, -750 Calories \n";
+					cout << "  Go for a (R)un --> +20 fitness, -2 strength, -300 calories \n";
+					cout << "  Do sit-(U)ps--> +4 fitness, +15 strength, -100 calories \n";
+					cout << "  Exercise on the e(l)liptical --> +20 fitness, -4 wealth, -1 strength, -60 calories\n";
+					cout << "  (W)eight Lift --> +8 Fitness, -10 Wealth, +30 Strength, -150 Calories \n";
+					cout << "  (G)o To Library --> -10 Wealth, -100 Calories, -1 Strength, +20 Knowledge \n";
+					cout << "  (C)ustom Activity-->\n\n";
 					cout << " Enter your choice --> ";
 					char c;
 
@@ -655,7 +791,9 @@ int main()
 					case 'G':
 						a = Activities::GoToLibrary;
 						break;
-
+					case 'C':
+						a = Activities::CustomActivity;
+						break;
 					default:
 						cout << "Ignoring invalid response " << c << endl;
 					}
@@ -679,6 +817,11 @@ int main()
 	cout << "\n\n**** Congradulations: you acheived your goal in " << nweeks << " weeks ****\n";
 	cout << " Your final stat were :  " << endl;
 	displayStats(&p, weeklySchedule);
+
+
+	char k;
+	cout << "Press any key to exit" << endl;
+	cin >> k;
 
 	return 0;
 }
